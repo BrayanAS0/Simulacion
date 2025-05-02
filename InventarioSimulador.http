@@ -1,0 +1,6 @@
+@InventarioSimulador_HostAddress = http://localhost:5145
+
+GET {{InventarioSimulador_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
