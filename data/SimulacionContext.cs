@@ -1,4 +1,5 @@
 ﻿using InventarioSimulador.Entidad;
+using InventarioSimulador.Modelos;
 using Microsoft.EntityFrameworkCore;
 
 namespace InventarioSimulador.data;
@@ -7,7 +8,9 @@ namespace InventarioSimulador.data;
     {
         public SimulacionContext(DbContextOptions<SimulacionContext> options) : base(options) { }
 
-        public DbSet<Simulacion> Simulaciones { get; set; }
+    public DbSet<Simulacion> Simulaciones { get; set; }
+         public DbSet<Material> Materiales { get; set; }
+
     }
 
 

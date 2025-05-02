@@ -10,21 +10,28 @@ namespace InventarioSimulador.Controllers;
 [Route("api/simulacion")]
 public class SimulacionController : ControllerBase
 {
-    public SimulacionContext db;
+    private readonly SimulacionContext db;
+
     public SimulacionController(SimulacionContext db)
     {
         this.db = db;
     }
+
     [HttpPost("ejecutar")]
-    public async Task<IActionResult> SimularInventario(
-        [FromBody] SimulacionRequest request)
+    public async Task<IActionResult> SimularInventario([FromBody] SimulacionRequest request)
     {
+        var material = await db.Materiales.FindAsync(request.IdMaterial);
+        if (material == null)
+        {
+            return NotFound("Material no encontrado");
+        }
+
         var resultados = new List<int>();
         var rand = new Random();
 
         for (int iter = 0; iter < request.Iteraciones; iter++)
         {
-            int inventario = request.StockInicial;
+            int inventario = material.StockActual;
             int desabasto = 0;
 
             for (int dia = 1; dia <= request.Dias; dia++)
@@ -52,13 +59,14 @@ public class SimulacionController : ControllerBase
 
         var simulacion = new Simulacion
         {
+            MaterialId = material.Id,
             Dias = request.Dias,
-            StockInicial = request.StockInicial,
             PuntoReorden = request.PuntoReorden,
             CantidadReorden = request.CantidadReorden,
             DiasReabastecimiento = request.DiasReabastecimiento,
             Iteraciones = request.Iteraciones,
-            PromedioDesabasto = resultados.Average()
+            PromedioDesabasto = resultados.Average(),
+            Fecha = DateTime.Now
         };
 
         db.Simulaciones.Add(simulacion);
@@ -76,6 +84,7 @@ public class SimulacionController : ControllerBase
     public async Task<IActionResult> ObtenerHistorial()
     {
         var historial = await db.Simulaciones
+            .Include(s => s.Material) // para mostrar nombre de material si se desea
             .OrderByDescending(s => s.Fecha)
             .ToListAsync();
 
