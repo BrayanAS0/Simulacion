@@ -4,8 +4,8 @@
     {
         public int Id { get; set; }
 
-        public int MaterialId { get; set; }              // Clave foránea a Material
-        public Material Material { get; set; }           // Navegación
+        public int MaterialId { get; set; }             
+        public Material Material { get; set; }          
 
         public int Dias { get; set; }
         public int PuntoReorden { get; set; }

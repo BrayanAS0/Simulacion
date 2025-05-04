@@ -90,4 +90,20 @@ public class SimulacionController : ControllerBase
 
         return Ok(historial);
     }
+
+    [HttpGet("Material")]
+    public async Task<IActionResult> ObtenerMaterial()
+    {
+        var historial = await db.Materiales
+            .ToListAsync();
+
+        return Ok(historial);
+    }
+    [HttpGet("Material/{id:int}")]
+    public async Task<IActionResult> ObtenerMaterialbyId(int id)
+    {
+        var material = await db.Materiales.FindAsync(id);
+
+        return Ok(material);
+    }
 }
