@@ -1,5 +1,6 @@
 ﻿using InventarioSimulador.data;
 using InventarioSimulador.Entidad;
+using InventarioSimulador.Metodos;
 using InventarioSimulador.Modelos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +12,6 @@ namespace InventarioSimulador.Controllers;
 public class SimulacionController : ControllerBase
 {
     private readonly SimulacionContext db;
-
     public SimulacionController(SimulacionContext db)
     {
         this.db = db;
@@ -84,7 +84,7 @@ public class SimulacionController : ControllerBase
     public async Task<IActionResult> ObtenerHistorial()
     {
         var historial = await db.Simulaciones
-            .Include(s => s.Material) // para mostrar nombre de material si se desea
+            .Include(s => s.Material) 
             .OrderByDescending(s => s.Fecha)
             .ToListAsync();
 
@@ -106,4 +106,27 @@ public class SimulacionController : ControllerBase
 
         return Ok(material);
     }
+
+        [HttpGet("Material/{stock:int}/{nombre}/{descripcion}")]
+    public async Task<IActionResult> IngresarMaterial(int stock,string nombre,string descripcion)
+    {
+        string patron = "L{3}-L{3}-d{4}";
+
+        var simulacion = new SimulacionMetodos(); // Asegúrate de reemplazar esto con el nombre correcto de la clase que implementa ValidarCadenaConPatron
+        var isValid = simulacion.ValidarCadenaConPatron(nombre, patron);
+        if (!isValid)
+        {
+            return Conflict("no ahi coherencia en el patron");
+        }
+        var material = new Material
+        {
+            Descripcion = descripcion,
+            StockActual = stock,
+            Nombre = nombre
+        };
+
+        await db.Materiales.AddAsync(material);
+        await db.SaveChangesAsync();
+        return Ok("exitoso");
+            }
 }
