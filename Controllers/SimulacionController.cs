@@ -129,4 +129,18 @@ public class SimulacionController : ControllerBase
         await db.SaveChangesAsync();
         return Ok("exitoso");
             }
+
+    [HttpPost("Material")]
+    public async Task<ActionResult> AgregarMateria(AgregarMaterialDto materialDto)
+    {
+
+        var isValid = new SimulacionMetodos().ValidarCadenaConPatron(materialDto.Nombre,"");
+
+        var material = new Material {Nombre=materialDto.Nombre,StockActual=materialDto.StockActual,StoreAddress=materialDto.StoreAddress,Descripcion=materialDto.Descripcion };
+
+        await db.Materiales.AddAsync(material);
+        await db.SaveChangesAsync();
+        return Ok(material);
+    }
+
 }
