@@ -107,40 +107,69 @@ public class SimulacionController : ControllerBase
         return Ok(material);
     }
 
-        [HttpGet("Material/{stock:int}/{nombre}/{descripcion}")]
-    public async Task<IActionResult> IngresarMaterial(int stock,string nombre,string descripcion)
-    {
-        string patron = "L{3}-L{3}-d{4}";
+    //    [HttpGet("Material/{stock:int}/{nombre}/{descripcion}")]
+    //public async Task<IActionResult> IngresarMaterial(int stock,string nombre,string descripcion)
+    //{
+    //    string patron = "L{3}-L{3}-d{4}";
 
-        var simulacion = new SimulacionMetodos(); // Asegúrate de reemplazar esto con el nombre correcto de la clase que implementa ValidarCadenaConPatron
-        var isValid = simulacion.ValidarCadenaConPatron(nombre, patron);
-        if (!isValid)
-        {
-            return Conflict("no ahi coherencia en el patron");
-        }
-        var material = new Material
-        {
-            Descripcion = descripcion,
-            StockActual = stock,
-            Nombre = nombre
-        };
+    //    var simulacion = new SimulacionMetodos(); // Asegúrate de reemplazar esto con el nombre correcto de la clase que implementa ValidarCadenaConPatron
+    //    var isValid = simulacion.ValidarCadenaConPatron(nombre, patron);
+    //    if (!isValid)
+    //    {
+    //        return Conflict("no ahi coherencia en el patron");
+    //    }
+    //    var material = new Material
+    //    {
+    //        Descripcion = descripcion,
+    //        StockActual = stock,
+    //        Nombre = nombre
+    //    };
 
-        await db.Materiales.AddAsync(material);
-        await db.SaveChangesAsync();
-        return Ok("exitoso");
-            }
+    //    await db.Materiales.AddAsync(material);
+    //    await db.SaveChangesAsync();
+    //    return Ok("exitoso");
+    //        }
 
-    [HttpPost("Material")]
+    [HttpPost("Material/agregarMaterial")]
     public async Task<ActionResult> AgregarMateria(AgregarMaterialDto materialDto)
     {
+        var material = new Material() {Nombre=materialDto.Nombre,StockActual=materialDto.StockActual,StoreAddress=materialDto.StoreAddress,Descripcion=materialDto.Descripcion };
+        var isValid = new SimulacionMetodos().ValidarCadenaConPatron(materialDto.StoreAddress,"Ld{1,4}");
+        if (isValid)
+        {
+            await db.Materiales.AddAsync(material);
+            await db.SaveChangesAsync();
+            return Ok(1);
+        }
+        return Conflict(2);
+        //var material = new Material {Nombre=materialDto.Nombre,StockActual=materialDto.StockActual,StoreAddress=materialDto.StoreAddress,Descripcion=materialDto.Descripcion };
 
-        var isValid = new SimulacionMetodos().ValidarCadenaConPatron(materialDto.Nombre,"");
-
-        var material = new Material {Nombre=materialDto.Nombre,StockActual=materialDto.StockActual,StoreAddress=materialDto.StoreAddress,Descripcion=materialDto.Descripcion };
-
-        await db.Materiales.AddAsync(material);
-        await db.SaveChangesAsync();
-        return Ok(material);
+        //await db.Materiales.AddAsync(material);
+        //await db.SaveChangesAsync();
+        //return Ok(material);
     }
+    [HttpGet("ObtenerHistorialConfiltro")]
+    public async Task<IActionResult> ObtenerHistorialConfiltro()
+    {
+        var isValid = new SimulacionMetodos();
+        string patron = "Ld{4}";
+
+        var historial = await db.Simulaciones
+            .Include(s => s.Material)
+            .OrderByDescending(s => s.Fecha)
+            .ToListAsync();
+
+        var filtrado = historial
+            .Where(x => isValid.ValidarCadenaConPatron(x.Material.StoreAddress, patron));
+
+        var resultadoFinal = filtrado
+            .GroupBy(x => x.MaterialId)
+            .Select(g => g.OrderByDescending(s => s.Fecha).First())
+            .ToList();
+
+        return Ok(resultadoFinal);
+    }
+
+
 
 }
