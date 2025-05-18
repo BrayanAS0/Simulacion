@@ -10,7 +10,7 @@ namespace InventarioSimulador.Metodos
             Inicio,
             EsperandoLetra,
             EsperandoNumero,
-            Exito,
+            Exito, 
             Error
         }
 
@@ -42,7 +42,6 @@ namespace InventarioSimulador.Metodos
                     if (char.IsDigit(c))
                     {
                         contadorNumeros++;
-                        // Permanece en el mismo estado
                     }
                     else
                     {
@@ -61,11 +60,9 @@ namespace InventarioSimulador.Metodos
 
         public bool ValidarCadenaConPatron(string cadena, string patron)
         {
-            // Primero validar con autómata finito (Tema 2.2)
             //if (!ValidarCodigoRackConAutomata(cadena)) // si no tiene una letra mayuscual al inicio y 4 digitos regresa false 
             //    return false;
 
-            // Luego validar con el patrón usando análisis léxico (Tema 3.3)
             int i = 0; //  cadena
             int p = 0; //  patron
             //ejemplo de un patron Ld{4} Y cadena F0206
@@ -75,7 +72,6 @@ namespace InventarioSimulador.Metodos
 
                 if (token == 'L' || token == 'd' || token == 'l' || token == 'a')
                 {
-                    // Manejo de repeticiones {min,max} (Tema 3.1)
                             if (p + 1 < patron.Length && patron[p + 1] == '{') ///patron = {
                             {
                                 int cierre = patron.IndexOf('}', p + 2); 

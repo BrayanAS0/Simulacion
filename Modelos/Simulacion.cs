@@ -13,7 +13,7 @@
         public int DiasReabastecimiento { get; set; }
         public int Iteraciones { get; set; }
 
-        public double PromedioDesabasto { get; set; }    // Resultado
+        public double PromedioDesabasto { get; set; }    
         public DateTime Fecha { get; set; } = DateTime.Now;
     }
 

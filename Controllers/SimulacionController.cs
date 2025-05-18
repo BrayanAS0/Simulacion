@@ -134,7 +134,7 @@ public class SimulacionController : ControllerBase
     public async Task<ActionResult> AgregarMateria(AgregarMaterialDto materialDto)
     {
         var material = new Material() {Nombre=materialDto.Nombre,StockActual=materialDto.StockActual,StoreAddress=materialDto.StoreAddress,Descripcion=materialDto.Descripcion };
-        var isValid = new SimulacionMetodos().ValidarCadenaConPatron(materialDto.StoreAddress,"Ld{1,4}");
+        var isValid = new SimulacionMetodos().ValidarCadenaConPatron(materialDto.StoreAddress,"Ld{4}");
         if (isValid)
         {
             await db.Materiales.AddAsync(material);
